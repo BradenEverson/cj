@@ -8,36 +8,28 @@ typedef enum {
     NUMBER,
     STRING,
     OBJECT,
-    ARRAY,
     BOOLEAN,
-    NULL,
+    NIL,
 } value_tag_t;
 
-struct value_t;
+struct json_object_t;
+
+typedef struct {
+    // hashmap of char* -> json_object_t
+} json_object_map_t;
 
 typedef union {
     double number;
-    char* string;
-    struct value_t* obj;
-    struct value_t* array;
+    char* str;
+    json_object_map_t* obj;
     int boolean;
-} value_union_t;
+} value_type_t;
 
-struct value_t {
+typedef struct json_object_t {
     value_tag_t tag;
-    value_union_t val;
-};
+    value_type_t val;
+} json_object_t;
 
-typedef struct entry_t {
-    char* key;
-    struct value_t value;
-    struct entry_t* next;
-} entry_t;
-
-typedef struct {
-    entry_t* table[TABLE_SIZE];
-} hashmap_t;
-
-void json_parse(const char* json, hashmap_t* map);
+void json_parse(const char* json, json_object_t* obj);
 
 #endif //CJ_H
