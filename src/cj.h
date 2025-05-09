@@ -14,9 +14,18 @@ typedef enum {
 
 struct json_object_t;
 
+typedef struct json_object_node_t {
+    char* key;
+    struct json_object_t* value;
+
+    json_object_node_t* next;
+} json_object_node_t;
+
 typedef struct {
-    // hashmap of char* -> json_object_t
+    json_object_node_t* table[TABLE_SIZE];
 } json_object_map_t;
+
+int hash(char* str);
 
 typedef union {
     double number;
