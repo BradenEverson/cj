@@ -66,3 +66,20 @@ void json_object_map_t_insert(json_object_map_t* map, const char* key, struct js
     new->next = map->table[idx];
     map->table[idx] = new;
 }
+
+json_object_t* json_object_map_t_get(json_object_map_t* map, const char* key) {
+    int hashed = hash(key);
+    int idx = hashed % TABLE_SIZE;
+
+    json_object_node_t* curr = map->table[idx];
+
+    while (curr != NULL) {
+        if (strcmp(curr->key, key) == 0) {
+            return curr->value;
+        }
+
+        curr = curr->next;
+    }
+
+    return NULL;
+}

@@ -31,6 +31,8 @@ void json_object_map_t_deinit(json_object_map_t* map);
 
 void json_object_map_t_insert(json_object_map_t* map, const char* key, struct json_object_t* val);
 
+struct json_object_t* json_object_map_t_get(json_object_map_t* map, const char* key);
+
 typedef union {
     double number;
     char* str;
