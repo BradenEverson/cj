@@ -1,4 +1,3 @@
-
 #ifndef CJ_H
 #define CJ_H
 
@@ -18,7 +17,7 @@ typedef struct json_object_node_t {
     char* key;
     struct json_object_t* value;
 
-    json_object_node_t* next;
+    struct json_object_node_t* next;
 } json_object_node_t;
 
 typedef struct {

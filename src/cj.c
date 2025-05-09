@@ -1,5 +1,17 @@
 #include "cj.h"
+#include <stddef.h>
 
-void json_parse(const char *json, json_object_t *obj) {
-    // todo
+int hash(char* str) {
+    if (str == NULL) {
+        return -1;
+    }
+
+    int result = 0;
+    int idx = 0;
+
+    while (str[idx] != '\0') {
+        result += str[idx];
+    }
+
+    return result;
 }
