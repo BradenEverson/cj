@@ -24,7 +24,12 @@ typedef struct {
     json_object_node_t* table[TABLE_SIZE];
 } json_object_map_t;
 
-int hash(char* str);
+int hash(const char* str);
+
+void json_object_map_t_init(json_object_map_t* map);
+void json_object_map_t_deinit(json_object_map_t* map);
+
+void json_object_map_t_insert(json_object_map_t* map, const char* key, struct json_object_t* val);
 
 typedef union {
     double number;
