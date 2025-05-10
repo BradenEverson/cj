@@ -1,4 +1,4 @@
-#include "cj.h"
+#include "../cj.h"
 #include <stdio.h>
 
 int main () {

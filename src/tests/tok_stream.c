@@ -1,4 +1,4 @@
-#include "cj.h"
+#include "../cj.h"
 
 int main() {
     token_stream_t t;
