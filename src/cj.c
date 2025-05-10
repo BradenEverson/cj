@@ -3,6 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * @brief - Hashes a string
+ * @param str - the string to hash
+ * @return hash number of the string
+ */
 int hash(const char* str) {
     if (str == NULL) {
         return -1;
@@ -18,12 +23,20 @@ int hash(const char* str) {
     return result;
 }
 
+/**
+ * @brief - Initializes a JSON Object HashMap
+ * @param map - pointer to the HashMap to initialize
+ */
 void json_object_map_t_init(json_object_map_t* map) {
     for (int i = 0; i < TABLE_SIZE; i++) {
         map->table[i] = NULL;
     }
 }
 
+/**
+ * @brief - Deinitializes and frees all allocated memory for a JSON Object HashMap
+ * @param map - pointer to the HashMap to initialize
+ */
 void json_object_map_t_deinit(json_object_map_t* map) {
     for (int i = 0; i < TABLE_SIZE; i++) {
         json_object_node_t* curr = map->table[i];
@@ -39,6 +52,12 @@ void json_object_map_t_deinit(json_object_map_t* map) {
     }
 }
 
+/**
+ * @brief - Registers a key value json object pair
+ * @param map - pointer to the HashMap to initialize
+ * @param key - The name of the object to register
+ * @param val - pointer to the json object to register, map will not own the pointer and rather perform a deep clone internally, so you have to free this val itself if you malloc'd it.
+ */
 void json_object_map_t_insert(json_object_map_t* map, const char* key, struct json_object_t* val) {
     int hashed = hash(key);
     int idx = hashed % TABLE_SIZE;
@@ -67,6 +86,14 @@ void json_object_map_t_insert(json_object_map_t* map, const char* key, struct js
     map->table[idx] = new;
 }
 
+/**
+ * @brief - Checks the HashMap for a key, returning a pointer to its JSON object if it exists
+ * @param map - Pointer to the HashMap to initialize
+ * @param key - Name of the entry to find
+ *
+ * @return pointer to the JSON object if it exists
+ * @return NULL if key doesn't exist
+ */
 json_object_t* json_object_map_t_get(json_object_map_t* map, const char* key) {
     int hashed = hash(key);
     int idx = hashed % TABLE_SIZE;
