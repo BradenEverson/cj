@@ -144,7 +144,7 @@ typedef enum {
 } token_tag_t;
 
 typedef struct {
-    char* start;
+    const char* start;
     int len;
     token_tag_t tag;
 } token_t;
