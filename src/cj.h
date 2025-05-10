@@ -9,6 +9,7 @@
 #define CJ_H
 
 #define TABLE_SIZE 10
+#define STREAM_START_SIZE 10
 
 /**
  * @brief - Types a JSON value can be
@@ -127,5 +128,37 @@ typedef struct json_object_t {
  * @param obj - pointer to the JSON object to populate
  */
 void json_parse(const char* json, int len, json_object_t* obj);
+
+typedef enum {
+    OPEN_BRACE,
+    CLOSE_BRACE,
+    OPEN_BRACKET,
+    CLOSE_BRACKET,
+    STR,
+    NUM,
+    TRUE,
+    FALSE,
+    NULL_TAG,
+    COMMA,
+    COLON,
+} token_tag_t;
+
+typedef struct {
+    char* start;
+    int len;
+    token_tag_t tag;
+} token_t;
+
+typedef struct {
+    token_t* items;
+    int len;
+    int capacity;
+} token_stream_t;
+
+void token_stream_t_init(token_stream_t* s);
+void token_stream_t_deinit(token_stream_t* s);
+void token_stream_t_push(token_stream_t* s, token_t add);
+
+void tokenize_json(const char* json, int size, token_stream_t* stream);
 
 #endif //CJ_H

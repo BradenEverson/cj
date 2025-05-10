@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+// HASHMAP IMPL
+
 /**
  * @brief - Hashes a string
  * @param str - the string to hash
@@ -109,4 +111,33 @@ json_object_t* json_object_map_t_get(json_object_map_t* map, const char* key) {
     }
 
     return NULL;
+}
+
+// TOKENIZER IMPL
+
+void token_stream_t_init(token_stream_t* s) {
+    s->items = malloc(sizeof(token_t) * STREAM_START_SIZE);
+    s->capacity = STREAM_START_SIZE;
+    s->len = 0;
+}
+
+void token_stream_t_deinit(token_stream_t* s) {
+    free(s->items);
+    s->capacity=0;
+    s->len=0;
+}
+
+void token_stream_t_push(token_stream_t* s, token_t add) {
+    if (s->capacity == 0) {
+        token_stream_t_init(s);
+    }
+
+    if (s->len < s->capacity) {
+        s->items[s->len++] = add;
+        return;
+    }
+
+    s->capacity *= 2;
+    s->items = realloc(s->items, s->capacity * sizeof(token_t));
+    s->items[s->len++] = add;
 }
