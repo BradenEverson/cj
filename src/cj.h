@@ -159,6 +159,6 @@ void token_stream_t_init(token_stream_t* s);
 void token_stream_t_deinit(token_stream_t* s);
 void token_stream_t_push(token_stream_t* s, token_t add);
 
-void tokenize_json(const char* json, int size, token_stream_t* stream);
+int tokenize_json(const char* json, int size, token_stream_t* stream);
 
 #endif //CJ_H
