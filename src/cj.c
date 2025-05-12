@@ -1,5 +1,6 @@
 #include "cj.h"
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -142,13 +143,71 @@ void token_stream_t_push(token_stream_t* s, token_t add) {
     s->items[s->len++] = add;
 }
 
+int is_whitespace(char c) {
+    return c == ' ' || c == '\t' || c == '\n';
+}
+
 int tokenize_json(const char* json, int size, token_stream_t* stream) {
     token_stream_t_init(stream);
     int idx = 0;
 
+    int flag;
+
+    token_t tok;
+
     while (idx < size) {
-        idx++;
+        tok.start = json + idx;
+        tok.len = 1;
+        flag = 1;
+
+        switch (json[idx]) {
+            case '[': 
+                tok.tag = OPEN_BRACKET;
+                break;
+
+            case ']': 
+                tok.tag = CLOSE_BRACKET;
+                break;
+
+            case '{': 
+                tok.tag = OPEN_BRACE;
+                break;
+
+            case '}': 
+                tok.tag = CLOSE_BRACE;
+                break;
+
+            case ',': 
+                tok.tag = COMMA;
+                break;
+
+            case ':':
+                tok.tag = COLON;
+                break;
+
+            case '"':
+                tok.tag = QUOTATION;
+                break;
+
+            case ' ':
+            case '\t':
+            case '\n':
+                while (is_whitespace(json[idx])) idx++;
+                flag = 0;
+                break;
+
+            default:
+                // Check if alphanumeric or just alphabetic, could be a number or 
+                // identifier
+                break;
+        }
+
+        if (flag) {
+            token_stream_t_push(stream, tok);
+            idx++;
+        }
     }
+
 
     return 0;
 }

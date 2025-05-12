@@ -134,13 +134,15 @@ typedef enum {
     CLOSE_BRACE,
     OPEN_BRACKET,
     CLOSE_BRACKET,
-    STR,
+    QUOTATION,
+    COMMA,
+
     NUM,
     TRUE,
+    COLON,
     FALSE,
     NULL_TAG,
-    COMMA,
-    COLON,
+    STR,
 } token_tag_t;
 
 typedef struct {
