@@ -144,11 +144,10 @@ void token_stream_t_push(token_stream_t* s, token_t add) {
 
 int tokenize_json(const char* json, int size, token_stream_t* stream) {
     token_stream_t_init(stream);
-
     int idx = 0;
 
     while (idx < size) {
-        
+        idx++;
     }
 
     return 0;
