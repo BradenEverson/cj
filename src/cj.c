@@ -300,3 +300,9 @@ void token_t_print(token_t* t) {
 
     printf("%s - %d\n", tag, t->len);
 }
+
+void token_t_src_print(token_t* t) {
+    for (int offset = 0; offset < t->len; offset++) {
+        printf("%c", (t->start + offset)[0]);
+    }
+}

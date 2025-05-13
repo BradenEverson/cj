@@ -152,6 +152,7 @@ typedef struct {
 } token_t;
 
 void token_t_print(token_t* t);
+void token_t_src_print(token_t* t);
 
 typedef struct {
     token_t* items;
