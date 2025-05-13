@@ -147,6 +147,18 @@ int is_whitespace(char c) {
     return c == ' ' || c == '\t' || c == '\n';
 }
 
+int is_alphabetic(char c) {
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c  <= 'z');
+}
+
+int is_numeric(char c) {
+    return c >= '0' && c <= '9';
+}
+
+int is_alphanumeric(char c) {
+    return is_alphabetic(c) || is_numeric(c);
+}
+
 int tokenize_json(const char* json, int size, token_stream_t* stream) {
     token_stream_t_init(stream);
     int idx = 0;
@@ -197,8 +209,29 @@ int tokenize_json(const char* json, int size, token_stream_t* stream) {
                 break;
 
             default:
-                // Check if alphanumeric or just alphabetic, could be a number or 
-                // identifier
+                if (is_alphabetic(json[idx])) {
+                    while (is_alphanumeric(json[idx])) {
+                        idx++;
+                        tok.len++;
+                    }
+
+                    idx--;
+                    tok.len--;
+                    // TODO: Check for keywords
+                    tok.tag = STR;
+                } else if (is_numeric(json[idx])) {
+                    while (is_numeric(json[idx]) || json[idx] == '.') {
+                        idx++;
+                        tok.len++;
+                    }
+                    tok.tag = NUM;
+                    idx--;
+                    tok.len--;
+
+                } else {
+                    return 1;
+                }
+
                 break;
         }
 
@@ -208,6 +241,62 @@ int tokenize_json(const char* json, int size, token_stream_t* stream) {
         }
     }
 
-
     return 0;
+}
+
+void token_t_print(token_t* t) {
+    const char* tag;
+
+    switch (t->tag) {
+        case OPEN_BRACE:
+            tag = "OPEN_BRACE";
+            break;
+
+        case CLOSE_BRACE:
+            tag = "CLOSE_BRACE";
+            break;
+
+        case OPEN_BRACKET:
+            tag = "OPEN_BRACKET";
+            break;
+
+        case CLOSE_BRACKET:
+            tag = "CLOSE_BRACKET";
+            break;
+
+        case QUOTATION:
+            tag = "QUOTATION";
+            break;
+
+        case COMMA:
+            tag = "COMMA";
+            break;
+
+        case NUM:
+            tag = "NUM";
+            break;
+
+        case TRUE:
+            tag = "TRUE";
+            break;
+
+        case COLON:
+            tag = "COLON";
+            break;
+
+        case FALSE:
+            tag = "FALSE";
+            break;
+
+        case NULL_TAG:
+            tag = "NULL_TAG";
+            break;
+
+        case STR:
+            tag = "STR";
+            break;
+
+    }
+
+    printf("%s - %d\n", tag, t->len);
 }

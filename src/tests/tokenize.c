@@ -6,6 +6,10 @@ int main() {
     char* src = "{\"foo\": 5.0}";
     tokenize_json(src, 12, &t);
 
+    for (int i = 0; i < t.len; i++) {
+        token_t_print(&t.items[i]);
+    }
+
     token_stream_t_deinit(&t);
     return 0;
 }

@@ -151,6 +151,8 @@ typedef struct {
     token_tag_t tag;
 } token_t;
 
+void token_t_print(token_t* t);
+
 typedef struct {
     token_t* items;
     int len;
