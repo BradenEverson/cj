@@ -210,15 +210,29 @@ int tokenize_json(const char* json, int size, token_stream_t* stream) {
 
             default:
                 if (is_alphabetic(json[idx])) {
+                    const char* start = json + idx;
+
                     while (is_alphanumeric(json[idx])) {
                         idx++;
                         tok.len++;
                     }
 
                     idx--;
-                    tok.len--;
-                    // TODO: Check for keywords
                     tok.tag = STR;
+                    tok.len--;
+
+                    char buf[tok.len + 1];
+                    strncpy(buf, start, tok.len);
+                    buf[tok.len] = '\0';
+
+                    if (strcmp(buf, "true") == 0) {
+                        tok.tag = TRUE;
+                    } else if (strcmp(buf, "false") == 0) {
+                        tok.tag = FALSE;
+                    } else if (strcmp(buf, "null") == 0) {
+                        tok.tag = NULL_TAG;
+                    }
+
                 } else if (is_numeric(json[idx])) {
                     while (is_numeric(json[idx]) || json[idx] == '.') {
                         idx++;
