@@ -320,3 +320,16 @@ void token_t_src_print(token_t* t) {
         printf("%c", (t->start + offset)[0]);
     }
 }
+
+/**
+ * @brief Parses a JSON buffer into a JSON Object
+ * @param json - JSON string buffer
+ * @param len - length of the JSON string buffer
+ * @param obj - pointer to the JSON object to populate
+ */
+void json_parse(const char* json, int len, json_object_t* obj) {
+    token_stream_t s;
+    tokenize_json(json, len, &s);
+
+    token_stream_t_deinit(&s);
+}
