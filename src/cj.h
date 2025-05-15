@@ -11,6 +11,9 @@
 #define TABLE_SIZE 10
 #define STREAM_START_SIZE 10
 
+#define INDEX_GREATER_THAN_LEN -1
+#define UNEXPECTED_TOKEN -2
+
 /**
  * @brief - Types a JSON value can be
  */
@@ -34,7 +37,7 @@ typedef enum {
     /**
      * @brief - NULL values
      */
-    NIL,
+    NULL_VAL,
 } value_tag_t;
 
 struct json_object_t;
@@ -121,13 +124,16 @@ typedef struct json_object_t {
     value_type_t val;
 } json_object_t;
 
+
 /**
  * @brief Parses a JSON buffer into a JSON Object
  * @param json - JSON string buffer
  * @param len - length of the JSON string buffer
  * @param obj - pointer to the JSON object to populate
+ * @return 0 on success
+ * @return negative number on failure
  */
-void json_parse(const char* json, int len, json_object_t* obj);
+int json_parse(const char* json, int len, json_object_t* obj);
 
 typedef enum {
     OPEN_BRACE,

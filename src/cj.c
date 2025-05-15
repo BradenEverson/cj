@@ -321,15 +321,104 @@ void token_t_src_print(token_t* t) {
     }
 }
 
+static int parse_value(token_stream_t* s, int* idx, json_object_t* obj);
+static int parse_object(token_stream_t* s, int* idx, json_object_t* obj);
+static int parse_number(token_stream_t* s, int* idx, json_object_t* obj);
+static int parse_boolean(token_stream_t* s, int* idx, json_object_t* obj);
+static int parse_null(token_stream_t* s, int* idx, json_object_t* obj);
+static int parse_string(token_stream_t* s, int* idx, json_object_t* obj);
+
+
+static int parse_object(token_stream_t* s, int* idx, json_object_t* obj) {
+    return 0;
+}
+
+static int parse_number(token_stream_t* s, int* idx, json_object_t* obj) {
+    return 0;
+}
+
+static int parse_boolean(token_stream_t* s, int* idx, json_object_t* obj) {
+    token_t* t = &s->items[*idx];
+    obj->tag = BOOLEAN;
+
+    switch (t->tag) {
+        case TRUE:
+            obj->val.boolean = 1;
+            break;
+
+        case FALSE:
+            obj->val.boolean = 0;
+            break;
+    
+        default:
+            // Should technically be unreachable
+            return UNEXPECTED_TOKEN;
+            break;
+    }
+
+    return 0;
+}
+
+static int parse_null(token_stream_t* s, int* idx, json_object_t* obj) {
+    obj->tag = NULL_VAL;
+    (*idx)++;
+    return 0;
+}
+
+static int parse_string(token_stream_t* s, int* idx, json_object_t* obj) {
+    return 0;
+}
+
+static int parse_value(token_stream_t* s, int* idx, json_object_t* obj) {
+    if (*idx >= s->len) return INDEX_GREATER_THAN_LEN;
+    token_t* t = &s->items[*idx];
+    switch (t->tag) {
+        case OPEN_BRACE:
+            parse_object(s, idx, obj);
+            break;
+
+        case QUOTATION:
+            parse_string(s, idx, obj);
+            break;
+
+        case NUM:
+            parse_number(s, idx, obj);
+            break;
+
+        case TRUE:
+        case FALSE:
+            parse_boolean(s, idx, obj);
+            break;
+
+        case NULL_TAG:
+            parse_null(s, idx, obj);
+            break;
+
+        default:
+            return UNEXPECTED_TOKEN;
+            break;
+    }
+
+    return 0;
+}
+
 /**
  * @brief Parses a JSON buffer into a JSON Object
  * @param json - JSON string buffer
  * @param len - length of the JSON string buffer
  * @param obj - pointer to the JSON object to populate
+ * @return 0 on success
+ * @return negative number on failure
  */
-void json_parse(const char* json, int len, json_object_t* obj) {
+int json_parse(const char* json, int len, json_object_t* obj) {
     token_stream_t s;
     tokenize_json(json, len, &s);
 
+    int idx = 0;
+
+    int return_code = parse_value(&s, &idx, obj);
+
+
     token_stream_t_deinit(&s);
+    return return_code;
 }
