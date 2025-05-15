@@ -356,6 +356,7 @@ static int parse_boolean(token_stream_t* s, int* idx, json_object_t* obj) {
             break;
     }
 
+    (*idx)++;
     return 0;
 }
 
@@ -366,6 +367,27 @@ static int parse_null(token_stream_t* s, int* idx, json_object_t* obj) {
 }
 
 static int parse_string(token_stream_t* s, int* idx, json_object_t* obj) {
+    // skip the "
+    (*idx)++;
+
+    token_t* t = &s->items[*idx];
+    if(t->tag != STR) {
+        return UNEXPECTED_TOKEN;
+    }
+
+    const char* start = t->start;
+
+    // TODO - we need to create a deinit for json_object_t that switches on 
+    // the tag and frees strings/nested objects
+    char* buf = malloc((t->len + 1) * sizeof(char));
+    strncpy(buf, start, t->len);
+    buf[t->len] = '\0';
+
+    obj->tag = STRING;
+    obj->val.str = buf;
+
+    // skip the " again and move on
+    (*idx) += 2;
     return 0;
 }
 
