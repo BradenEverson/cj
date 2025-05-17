@@ -46,6 +46,7 @@ void json_object_map_t_deinit(json_object_map_t* map) {
 
         while (curr != NULL) {
             free(curr->key);
+            json_deinit(curr->value);
             free(curr->value);
 
             json_object_node_t* tmp = curr;
@@ -148,7 +149,7 @@ int is_whitespace(char c) {
 }
 
 int is_alphabetic(char c) {
-    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c  <= 'z');
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c  <= 'z') || c == '_';
 }
 
 int is_numeric(char c) {
@@ -163,9 +164,8 @@ int tokenize_json(const char* json, int size, token_stream_t* stream) {
     token_stream_t_init(stream);
     int idx = 0;
 
-    int flag;
-
-    token_t tok;
+    int flag = 1;
+    token_t tok = {0};
 
     while (idx < size) {
         tok.start = json + idx;
@@ -330,10 +330,62 @@ static int parse_string(token_stream_t* s, int* idx, json_object_t* obj);
 
 
 static int parse_object(token_stream_t* s, int* idx, json_object_t* obj) {
+    obj->tag = OBJECT;
+    json_object_map_t* map = malloc(sizeof(json_object_map_t));
+    obj->val.obj = map;
+    json_object_map_t_init(obj->val.obj);
+
+    // Skip {
+    (*idx)++;
+
+    while (*idx < s->len) {
+        token_t* t = &s->items[*idx];
+
+        if (t->tag == CLOSE_BRACE) {
+            (*idx)++;
+            return 0;
+        }
+
+        json_object_t key_obj;
+        parse_string(s, idx, &key_obj);
+        char* key = key_obj.val.str;
+
+        t = &s->items[*idx];
+        if (t->tag != COLON) {
+            free(key);
+            return UNEXPECTED_TOKEN;
+        }
+        (*idx)++;
+
+        json_object_t val_obj;
+        parse_value(s, idx, &val_obj);
+        
+        json_object_map_t_insert(obj->val.obj, key, &val_obj);
+        free(key);
+        
+        t = &s->items[*idx];
+        if (t->tag == COMMA) {
+            (*idx)++;
+        } else if (t->tag != CLOSE_BRACE) {
+            return UNEXPECTED_TOKEN;
+        }
+    }
+
     return 0;
 }
 
 static int parse_number(token_stream_t* s, int* idx, json_object_t* obj) {
+    token_t* t = &s->items[*idx];
+    const char* start = t->start;
+
+    char buf[t->len + 1];
+    strncpy(buf, start, t->len);
+    buf[t->len] = '\0';
+
+    obj->tag = NUMBER;
+    obj->val.number = strtof(buf, NULL);
+
+    (*idx)++;
     return 0;
 }
 
@@ -440,7 +492,25 @@ int json_parse(const char* json, int len, json_object_t* obj) {
 
     int return_code = parse_value(&s, &idx, obj);
 
-
     token_stream_t_deinit(&s);
     return return_code;
+}
+
+void json_deinit(json_object_t* json) {
+    switch (json->tag) {
+        case STRING:
+            free(json->val.str);
+            break;
+
+        case OBJECT:
+            json_object_map_t_deinit(json->val.obj);
+            free(json->val.obj);
+            break;
+
+        case NUMBER: 
+        case BOOLEAN:
+        case NULL_VAL:
+        default:
+            break;
+    }
 }

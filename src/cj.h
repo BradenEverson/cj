@@ -135,6 +135,9 @@ typedef struct json_object_t {
  */
 int json_parse(const char* json, int len, json_object_t* obj);
 
+// TODO
+void json_deinit(json_object_t* json);
+
 typedef enum {
     OPEN_BRACE,
     CLOSE_BRACE,
