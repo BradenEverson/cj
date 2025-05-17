@@ -1,4 +1,4 @@
-#include "../cj.h"
+#include "../json.h"
 
 int main() {
     token_stream_t t;
