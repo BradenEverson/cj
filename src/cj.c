@@ -117,18 +117,31 @@ json_object_t* json_object_map_t_get(json_object_map_t* map, const char* key) {
 
 // TOKENIZER IMPL
 
+/**
+ * @brief initializes a token stream
+ * @param s - pointer to the stream to init
+ */
 void token_stream_t_init(token_stream_t* s) {
     s->items = malloc(sizeof(token_t) * STREAM_START_SIZE);
     s->capacity = STREAM_START_SIZE;
     s->len = 0;
 }
 
+/**
+ * @brief frees a token stream
+ * @param s - pointer to the stream to free
+ */
 void token_stream_t_deinit(token_stream_t* s) {
     free(s->items);
     s->capacity=0;
     s->len=0;
 }
 
+/**
+ * @brief Pushes a new token to the stream
+ * @param s - pointer to the stream to add to
+ * @param add - new token to add
+ */
 void token_stream_t_push(token_stream_t* s, token_t add) {
     if (s->capacity == 0) {
         token_stream_t_init(s);
@@ -144,22 +157,28 @@ void token_stream_t_push(token_stream_t* s, token_t add) {
     s->items[s->len++] = add;
 }
 
-int is_whitespace(char c) {
+static int is_whitespace(char c) {
     return c == ' ' || c == '\t' || c == '\n';
 }
 
-int is_alphabetic(char c) {
+static int is_alphabetic(char c) {
     return (c >= 'A' && c <= 'Z') || (c >= 'a' && c  <= 'z') || c == '_';
 }
 
-int is_numeric(char c) {
+static int is_numeric(char c) {
     return c >= '0' && c <= '9';
 }
 
-int is_alphanumeric(char c) {
+static int is_alphanumeric(char c) {
     return is_alphabetic(c) || is_numeric(c);
 }
 
+/**
+ * @brief Tokenizes a string and appends all tokens to a stream
+ * @param json - JSON string to tokenize
+ * @param size - size of the JSON string
+ * @param stream - token stream to append to
+ */
 int tokenize_json(const char* json, int size, token_stream_t* stream) {
     token_stream_t_init(stream);
     int idx = 0;
@@ -258,6 +277,10 @@ int tokenize_json(const char* json, int size, token_stream_t* stream) {
     return 0;
 }
 
+/**
+ * @brief prints the token out
+ * @param t - pointer to the token to print
+ */
 void token_t_print(token_t* t) {
     const char* tag;
 
@@ -315,6 +338,10 @@ void token_t_print(token_t* t) {
     printf("%s - %d\n", tag, t->len);
 }
 
+/**
+ * @brief prints the token's value within a buffer
+ * @param t - pointer to the token to print
+ */
 void token_t_src_print(token_t* t) {
     for (int offset = 0; offset < t->len; offset++) {
         printf("%c", (t->start + offset)[0]);
@@ -327,7 +354,6 @@ static int parse_number(token_stream_t* s, int* idx, json_object_t* obj);
 static int parse_boolean(token_stream_t* s, int* idx, json_object_t* obj);
 static int parse_null(token_stream_t* s, int* idx, json_object_t* obj);
 static int parse_string(token_stream_t* s, int* idx, json_object_t* obj);
-
 
 static int parse_object(token_stream_t* s, int* idx, json_object_t* obj) {
     obj->tag = OBJECT;
@@ -429,8 +455,6 @@ static int parse_string(token_stream_t* s, int* idx, json_object_t* obj) {
 
     const char* start = t->start;
 
-    // TODO - we need to create a deinit for json_object_t that switches on 
-    // the tag and frees strings/nested objects
     char* buf = malloc((t->len + 1) * sizeof(char));
     strncpy(buf, start, t->len);
     buf[t->len] = '\0';
@@ -496,6 +520,11 @@ int json_parse(const char* json, int len, json_object_t* obj) {
     return return_code;
 }
 
+/**
+ * @brief Frees all memory tied to the JSON Object if it had any heap stored values (sub-objects or strings)
+ * Does not free the underlying pointer
+ * @param json - JSON object to deinit
+ */
 void json_deinit(json_object_t* json) {
     switch (json->tag) {
         case STRING:

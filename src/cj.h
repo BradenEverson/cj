@@ -4,7 +4,6 @@
  * @brief JSON Parsing Single File header and source, containing hashmap, json object and parsing structure definitions
  */
 
-
 #ifndef CJ_H
 #define CJ_H
 
@@ -135,45 +134,130 @@ typedef struct json_object_t {
  */
 int json_parse(const char* json, int len, json_object_t* obj);
 
-// TODO
+/**
+ * @brief Frees all memory tied to the JSON Object if it had any heap stored values (sub-objects or strings)
+ * Does not free the underlying pointer
+ * @param json - JSON object to deinit
+ */
 void json_deinit(json_object_t* json);
 
+/**
+ * @brief - Token Types
+ */
 typedef enum {
+    /**
+     * @brief - {
+     */
     OPEN_BRACE,
+    /**
+     * @brief - }
+     */
     CLOSE_BRACE,
+    /**
+     * @brief - [
+     */
     OPEN_BRACKET,
+    /**
+     * @brief - ]
+     */
     CLOSE_BRACKET,
+    /**
+     * @brief - "
+     */
     QUOTATION,
+    /**
+     * @brief - ,
+     */
     COMMA,
+    /**
+     * @brief - :
+     */
     COLON,
 
+    /**
+     * @brief - true
+     */
     TRUE,
+    /**
+     * @brief - false
+     */
     FALSE,
+    /**
+     * @brief - null
+     */
     NULL_TAG,
 
+    /**
+     * @brief - a string
+     */
     STR,
+    /**
+     * @brief - a number
+     */
     NUM,
 } token_tag_t;
 
+/**
+ * @brief - A token with it's type and pointer into the underlying buffer
+ * @property start - start of the token in the underlying string
+ * @property len - length of the token
+ * @property tag - type of the token
+ */
 typedef struct {
     const char* start;
     int len;
     token_tag_t tag;
 } token_t;
 
+/**
+ * @brief prints the token out
+ * @param t - pointer to the token to print
+ */
 void token_t_print(token_t* t);
+
+/**
+ * @brief prints the token's value within a buffer
+ * @param t - pointer to the token to print
+ */
 void token_t_src_print(token_t* t);
 
+/**
+ * @brief - A growing stream of tokens
+ * @property items - pointer to the tokens
+ * @property len - length of the stream
+ * @property capacity - total length of the memory allocated
+ */
 typedef struct {
     token_t* items;
     int len;
     int capacity;
 } token_stream_t;
 
+/**
+ * @brief initializes a token stream
+ * @param s - pointer to the stream to init
+ */
 void token_stream_t_init(token_stream_t* s);
+
+/**
+ * @brief frees a token stream
+ * @param s - pointer to the stream to free
+ */
 void token_stream_t_deinit(token_stream_t* s);
+
+/**
+ * @brief Pushes a new token to the stream
+ * @param s - pointer to the stream to add to
+ * @param add - new token to add
+ */
 void token_stream_t_push(token_stream_t* s, token_t add);
 
+/**
+ * @brief Tokenizes a string and appends all tokens to a stream
+ * @param json - JSON string to tokenize
+ * @param size - size of the JSON string
+ * @param stream - token stream to append to
+ */
 int tokenize_json(const char* json, int size, token_stream_t* stream);
 
 #endif //CJ_H
