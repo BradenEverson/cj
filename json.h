@@ -4,8 +4,8 @@
  * @brief JSON Parsing Single header library, containing hashmap, json object and parsing structure definitions
  */
 
-#ifndef CJ_H
-#define CJ_H
+#ifndef JSON_H
+#define JSON_H
 
 #include <stddef.h>
 #include <stdio.h>
@@ -805,4 +805,4 @@ void json_deinit(json_object_t* json) {
     }
 }
 
-#endif //CJ_H
+#endif //JSON_H
